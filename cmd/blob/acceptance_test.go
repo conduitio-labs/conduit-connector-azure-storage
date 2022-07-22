@@ -85,9 +85,6 @@ func TestAcceptance(t *testing.T) {
 				},
 
 				Skip: []string{
-					// When restarting snapshot position, bucket is read from the beginning
-					"TestAcceptance/TestSource_Open_ResumeAtPositionSnapshot",
-
 					// Cannot be tested. driver.WriteToSource() creates all records at once while CDC position is
 					// created after the Snapshot iterator finishes iterating. So from the CDC iterator point of view,
 					// there are no new records available.
