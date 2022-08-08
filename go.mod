@@ -6,7 +6,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.1.1
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
 	github.com/conduitio/conduit-connector-sdk v0.2.0
-	github.com/jaswdr/faker v1.14.1
+	github.com/jaswdr/faker v1.15.0
 	github.com/stretchr/testify v1.8.0
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 )
