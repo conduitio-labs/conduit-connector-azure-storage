@@ -25,6 +25,7 @@ func Specification() sdk.Specification {
 	return sdk.Specification{
 		Name:              "azure-storage",
 		Summary:           "An Azure Storage source plugin for Conduit.",
+		Description:       "The Conduit plugin supporting Azure Storage source.",
 		Version:           "v0.1.0",
 		Author:            "Miquido",
 		DestinationParams: map[string]sdk.Parameter{
