@@ -16,14 +16,9 @@ package main
 
 import (
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	as "github.com/miquido/conduit-connector-azure-storage"
-	asSource "github.com/miquido/conduit-connector-azure-storage/source"
+	azure "github.com/miquido/conduit-connector-azure-storage"
 )
 
 func main() {
-	sdk.Serve(sdk.Connector{
-		NewSpecification: as.Specification,
-		NewSource:        asSource.NewSource,
-		NewDestination:   nil,
-	})
+	sdk.Serve(azure.Connector)
 }

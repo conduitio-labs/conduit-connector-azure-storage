@@ -23,7 +23,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	"github.com/miquido/conduit-connector-azure-storage/internal"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
 	"gopkg.in/tomb.v2"
 )
@@ -136,16 +135,13 @@ func (w *SnapshotIterator) producer() error {
 				}
 
 				// Prepare the sdk.Record
-				record := sdk.Record{
-					Metadata: map[string]string{
-						"action":       internal.OperationInsert,
-						"content-type": *item.Properties.ContentType,
-					},
-					Position:  recordPosition,
-					Payload:   sdk.RawData(rawBody),
-					Key:       sdk.RawData(*item.Name),
-					CreatedAt: *item.Properties.CreationTime,
-				}
+				metadata := make(sdk.Metadata)
+				metadata.SetCreatedAt(*item.Properties.CreationTime)
+				metadata["content-type"] = *item.Properties.ContentType
+
+				record := sdk.Util.Source.NewRecordSnapshot(
+					recordPosition, metadata, sdk.RawData(*item.Name), sdk.RawData(rawBody),
+				)
 
 				// Send out the record if possible
 				select {

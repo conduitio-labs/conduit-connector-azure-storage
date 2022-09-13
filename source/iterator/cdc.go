@@ -23,7 +23,6 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	"github.com/miquido/conduit-connector-azure-storage/internal"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
 	"gopkg.in/tomb.v2"
 )
@@ -197,26 +196,20 @@ func (w *CDCIterator) createUpsertedRecord(entry *azblob.BlobItemInternal, objec
 		return sdk.Record{}, err
 	}
 
-	// Detect operation
-	var action internal.Operation
+	// Prepare metadata
+	metadata := make(sdk.Metadata)
+	metadata.SetCreatedAt(p.Timestamp)
+	metadata["content-type"] = *object.ContentType
 
 	if entry.Properties.CreationTime == nil || entry.Properties.LastModified == nil || entry.Properties.CreationTime.Equal(*entry.Properties.LastModified) {
-		action = internal.OperationInsert
-	} else {
-		action = internal.OperationUpdate
+		return sdk.Util.Source.NewRecordCreate(
+			recordPosition, metadata, sdk.RawData(p.Key), sdk.RawData(rawBody),
+		), nil
 	}
 
-	// Return the record
-	return sdk.Record{
-		Metadata: map[string]string{
-			"action":       action,
-			"content-type": *object.ContentType,
-		},
-		Position:  recordPosition,
-		Payload:   sdk.RawData(rawBody),
-		Key:       sdk.RawData(p.Key),
-		CreatedAt: p.Timestamp,
-	}, nil
+	return sdk.Util.Source.NewRecordUpdate(
+		recordPosition, metadata, sdk.RawData(p.Key), nil, sdk.RawData(rawBody),
+	), nil
 }
 
 // createDeletedRecord converts blob item into sdk.Record indicating that item was removed or returns error
@@ -230,13 +223,10 @@ func (w *CDCIterator) createDeletedRecord(entry *azblob.BlobItemInternal) (sdk.R
 		return sdk.Record{}, err
 	}
 
+	// Prepare metadata
+	metadata := make(sdk.Metadata)
+	metadata.SetCreatedAt(p.Timestamp)
+
 	// Return the record
-	return sdk.Record{
-		Metadata: map[string]string{
-			"action": internal.OperationDelete,
-		},
-		Position:  recordPosition,
-		Key:       sdk.RawData(p.Key),
-		CreatedAt: p.Timestamp,
-	}, nil
+	return sdk.Util.Source.NewRecordDelete(recordPosition, metadata, sdk.RawData(p.Key)), nil
 }

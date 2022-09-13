@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"strconv"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	sdk "github.com/conduitio/conduit-connector-sdk"
@@ -35,7 +36,33 @@ type Source struct {
 }
 
 func NewSource() sdk.Source {
-	return &Source{}
+	return sdk.SourceWithMiddleware(&Source{}, sdk.DefaultSourceMiddleware()...)
+}
+
+// Parameters is a map of named Parameters that describe how to configure the Source.
+func (s *Source) Parameters() map[string]sdk.Parameter {
+	return map[string]sdk.Parameter{
+		ConfigKeyConnectionString: {
+			Default:     "",
+			Required:    true,
+			Description: "The Azure Storage connection string.",
+		},
+		ConfigKeyContainerName: {
+			Default:     "",
+			Required:    true,
+			Description: "The name of the container to monitor.",
+		},
+		ConfigKeyPollingPeriod: {
+			Default:     DefaultPollingPeriod,
+			Required:    false,
+			Description: "The polling period for the CDC mode, formatted as a time.Duration string.",
+		},
+		ConfigKeyMaxResults: {
+			Default:     strconv.FormatInt(int64(DefaultMaxResults), 32),
+			Required:    false,
+			Description: "The maximum number of items, per page, when reading container's items.",
+		},
+	}
 }
 
 func (s *Source) Configure(_ context.Context, cfgRaw map[string]string) (err error) {

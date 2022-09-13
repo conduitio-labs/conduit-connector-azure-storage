@@ -24,7 +24,6 @@ import (
 
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/jaswdr/faker"
-	"github.com/miquido/conduit-connector-azure-storage/internal"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
 	helper "github.com/miquido/conduit-connector-azure-storage/test"
 	"github.com/stretchr/testify/require"
@@ -85,13 +84,13 @@ func TestSnapshotIterator(t *testing.T) {
 			record1, err := iterator.Next(ctx)
 			require.NoError(t, err)
 			require.True(t, helper.AssertRecordEquals(t, record1, record1Name, "text/plain", record1Contents))
-			require.Equal(t, internal.OperationInsert, record1.Metadata["action"])
+			require.Equal(t, sdk.OperationSnapshot, record1.Operation)
 
 			require.True(t, iterator.HasNext(ctx))
 			record2, err := iterator.Next(ctx)
 			require.NoError(t, err)
 			require.True(t, helper.AssertRecordEquals(t, record2, record2Name, "text/plain", record2Contents))
-			require.Equal(t, internal.OperationInsert, record2.Metadata["action"])
+			require.Equal(t, sdk.OperationSnapshot, record2.Operation)
 
 			// Let the Goroutine finish
 			for iterator.tomb.Alive() {
@@ -133,19 +132,19 @@ func TestSnapshotIterator(t *testing.T) {
 		record1, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record1, record1Name, "text/plain", record1Contents))
-		require.Equal(t, internal.OperationInsert, record1.Metadata["action"])
+		require.Equal(t, sdk.OperationSnapshot, record1.Operation)
 
 		require.True(t, iterator.HasNext(ctx))
 		record2, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record2, record2Name, "text/plain", record2Contents))
-		require.Equal(t, internal.OperationInsert, record2.Metadata["action"])
+		require.Equal(t, sdk.OperationSnapshot, record2.Operation)
 
 		require.True(t, iterator.HasNext(ctx))
 		record3, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record3, record3Name, "text/plain", record3Contents))
-		require.Equal(t, internal.OperationInsert, record3.Metadata["action"])
+		require.Equal(t, sdk.OperationSnapshot, record3.Operation)
 
 		// Let the Goroutine finish
 		for iterator.tomb.Alive() {
@@ -183,7 +182,7 @@ func TestSnapshotIterator(t *testing.T) {
 		record1, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record1, record1Name, "text/plain", record1Contents))
-		require.Equal(t, internal.OperationInsert, record1.Metadata["action"])
+		require.Equal(t, sdk.OperationSnapshot, record1.Operation)
 
 		// Stop the iterator
 		iterator.Stop()
@@ -230,7 +229,7 @@ func TestSnapshotIterator(t *testing.T) {
 		record1, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record1, record1Name, "text/plain", record1Contents))
-		require.Equal(t, internal.OperationInsert, record1.Metadata["action"])
+		require.Equal(t, sdk.OperationSnapshot, record1.Operation)
 
 		// Cancel the context
 		cancelFunc()

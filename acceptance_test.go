@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package azure
 
 import (
 	"fmt"
@@ -21,8 +21,7 @@ import (
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	as "github.com/miquido/conduit-connector-azure-storage"
-	asSource "github.com/miquido/conduit-connector-azure-storage/source"
+	"github.com/miquido/conduit-connector-azure-storage/source"
 	helper "github.com/miquido/conduit-connector-azure-storage/test"
 	"go.uber.org/goleak"
 )
@@ -33,15 +32,11 @@ type CustomConfigurableAcceptanceTestDriver struct {
 	containerClient *azblob.ContainerClient
 }
 
-func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T) sdk.Record {
-	record := d.ConfigurableAcceptanceTestDriver.GenerateRecord(t)
+func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T, op sdk.Operation) sdk.Record {
+	record := d.ConfigurableAcceptanceTestDriver.GenerateRecord(t, op)
 
 	// Override Key
 	record.Key = sdk.RawData(fmt.Sprintf("file-%d.txt", time.Now().UnixMicro()))
-
-	// Override CreatedAt
-	// azurite does not support milliseconds precision
-	record.CreatedAt = record.CreatedAt.Truncate(time.Second)
 
 	return record
 }
@@ -52,7 +47,7 @@ func (d *CustomConfigurableAcceptanceTestDriver) WriteToSource(t *testing.T, rec
 			d.containerClient,
 			string(record.Key.Bytes()),
 			"text/plain",
-			string(record.Payload.Bytes()),
+			string(record.Payload.After.Bytes()),
 		)
 	}
 
@@ -62,18 +57,14 @@ func (d *CustomConfigurableAcceptanceTestDriver) WriteToSource(t *testing.T, rec
 
 func TestAcceptance(t *testing.T) {
 	sourceConfig := map[string]string{
-		asSource.ConfigKeyConnectionString: helper.GetConnectionString(),
-		asSource.ConfigKeyContainerName:    "acceptance-tests",
+		source.ConfigKeyConnectionString: helper.GetConnectionString(),
+		source.ConfigKeyContainerName:    "acceptance-tests",
 	}
 
 	testDriver := CustomConfigurableAcceptanceTestDriver{
 		ConfigurableAcceptanceTestDriver: sdk.ConfigurableAcceptanceTestDriver{
 			Config: sdk.ConfigurableAcceptanceTestDriverConfig{
-				Connector: sdk.Connector{
-					NewSpecification: as.Specification,
-					NewSource:        asSource.NewSource,
-					NewDestination:   nil,
-				},
+				Connector: Connector,
 
 				SourceConfig:     sourceConfig,
 				GenerateDataType: sdk.GenerateRawData,
@@ -100,7 +91,7 @@ func TestAcceptance(t *testing.T) {
 	}
 
 	testDriver.ConfigurableAcceptanceTestDriver.Config.BeforeTest = func(t *testing.T) {
-		testDriver.containerClient = helper.PrepareContainer(t, helper.NewAzureBlobServiceClient(), sourceConfig[asSource.ConfigKeyContainerName])
+		testDriver.containerClient = helper.PrepareContainer(t, helper.NewAzureBlobServiceClient(), sourceConfig[source.ConfigKeyContainerName])
 	}
 
 	sdk.AcceptanceTest(t, &testDriver)
