@@ -18,7 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
@@ -182,7 +182,7 @@ func (w *CDCIterator) producer() error {
 // createUpsertedRecord converts blob item into sdk.Record with item's contents or returns error when failure.
 func (w *CDCIterator) createUpsertedRecord(entry *azblob.BlobItemInternal, object azblob.BlobDownloadResponse) (sdk.Record, error) {
 	// Try to read item's contents
-	rawBody, err := ioutil.ReadAll(object.Body(&azblob.RetryReaderOptions{
+	rawBody, err := io.ReadAll(object.Body(&azblob.RetryReaderOptions{
 		MaxRetryRequests: 0,
 	}))
 	if err != nil {

@@ -18,7 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
@@ -120,7 +120,7 @@ func (w *SnapshotIterator) producer() error {
 					return err
 				}
 
-				rawBody, err := ioutil.ReadAll(downloadResponse.Body(&azblob.RetryReaderOptions{
+				rawBody, err := io.ReadAll(downloadResponse.Body(&azblob.RetryReaderOptions{
 					MaxRetryRequests: 0,
 				}))
 				if err != nil {
