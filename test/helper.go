@@ -108,5 +108,5 @@ func AssertRecordEquals(t *testing.T, record sdk.Record, fileName, contentType, 
 		assert.NotNil(t, record.Payload, "Record Payload is not set.") &&
 		assert.Equal(t, fileName, string(record.Key.Bytes()), "Record name does not match.") &&
 		assert.Equal(t, contentType, record.Metadata["content-type"], "Record's content-type metadata does not match.") &&
-		assert.Equal(t, contents, string(record.Payload.Bytes()), "Record payload does not match.")
+		assert.Equal(t, contents, string(record.Payload.After.Bytes()), "Record payload does not match.")
 }

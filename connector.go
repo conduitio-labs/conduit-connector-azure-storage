@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package internal
+package azure
 
-type Operation = string
-
-// Below is a list of all supported operations.
-// These come from Record's Metadata["action"] field, and they instruct the connector how the Record should be handled.
-// See: https://github.com/ConduitIO/conduit/blob/main/docs/design-documents/20220309-opencdc.md#changes-to-record
-const (
-	OperationInsert Operation = "insert"
-	OperationUpdate Operation = "update"
-	OperationDelete Operation = "delete"
+import (
+	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/miquido/conduit-connector-azure-storage/source"
 )
+
+// Connector represents a sdk.Connector for Azure Storage.
+var Connector = sdk.Connector{
+	NewSpecification: Specification,
+	NewSource:        source.NewSource,
+	NewDestination:   nil,
+}
