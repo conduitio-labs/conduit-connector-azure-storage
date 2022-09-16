@@ -121,16 +121,21 @@ func (w *CDCIterator) producer() error {
 
 				for _, item := range resp.Segment.BlobItems {
 					itemLastModificationDate := *item.Properties.LastModified
+					itemDeletionTime := item.Properties.DeletedTime
 
-					// Reject item when it wasn't modified since the last iteration
+					// Reject item when it wasn't modified or deleted since the last iteration
 					if itemLastModificationDate.Before(w.lastModified) {
-						continue
+						if itemDeletionTime != nil && itemDeletionTime.After(w.lastModified) {
+							itemLastModificationDate = *itemDeletionTime
+						} else {
+							continue
+						}
 					}
 
 					// Prepare the sdk.Record
 					var output sdk.Record
 
-					if nil != item.Deleted && *item.Deleted {
+					if item.Deleted != nil && *item.Deleted {
 						var err error
 
 						output, err = w.createDeletedRecord(item)
