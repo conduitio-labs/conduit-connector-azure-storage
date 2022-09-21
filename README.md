@@ -46,6 +46,10 @@ However, [soft delete for blobs](https://docs.microsoft.com/azure/storage/blobs/
 Run `make test` to run all the unit and integration tests, which require Docker to be installed and running. The command
 will handle starting and stopping docker containers for you.
 
+### Known Issues & Limitations
+
+- The connector is able to send record's `Key` and `Payload` as `sdk.RawData` only.
+
 ## References
 
 - [What is Azure Blob storage?](https://docs.microsoft.com/azure/storage/blobs/storage-blobs-overview)
