@@ -18,12 +18,17 @@ import (
 	sdk "github.com/conduitio/conduit-connector-sdk"
 )
 
+// version is set during the build process (i.e. the Makefile).
+// It follows Go's convention for module version, where the version
+// starts with the letter v, followed by a semantic version.
+var version = "v0.0.0-dev"
+
 func Specification() sdk.Specification {
 	return sdk.Specification{
 		Name:        "azure-storage",
 		Summary:     "An Azure Storage source plugin for Conduit.",
 		Description: "The Conduit plugin supporting Azure Storage source.",
-		Version:     "v0.1.0",
-		Author:      "Miquido",
+		Version:     version,
+		Author:      "Meroxa, Inc.",
 	}
 }

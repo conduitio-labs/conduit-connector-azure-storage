@@ -1,7 +1,9 @@
 .PHONY: build test lint
 
+VERSION=$(shell git describe --tags --dirty --always)
+
 build:
-	go build -o conduit-connector-azure-storage cmd/blob/main.go
+	go build -ldflags "-X 'github.com/conduitio-labs/conduit-connector-azure-storage.version=${VERSION}'" -o conduit-connector-azure-storage cmd/connector/main.go
 
 test:
 	docker compose -f test/docker-compose.yml -p tests up --quiet-pull -d --wait
