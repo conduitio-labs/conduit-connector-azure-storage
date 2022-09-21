@@ -29,6 +29,6 @@ func Specification() sdk.Specification {
 		Summary:     "An Azure Storage source plugin for Conduit.",
 		Description: "The Conduit plugin supporting Azure Storage source.",
 		Version:     version,
-		Author:      "Meroxa, Inc.",
+		Author:      "Miquido",
 	}
 }
