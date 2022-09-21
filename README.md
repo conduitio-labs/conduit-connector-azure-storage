@@ -48,7 +48,7 @@ will handle starting and stopping docker containers for you.
 
 ### Known Issues & Limitations
 
-- The connector is able to send record's `Key` as `sdk.RawData` only.
+- The connector is able to send record's `Key` and `Payload` as `sdk.RawData` only.
 
 ## References
 
