@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.2.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
-	github.com/conduitio/conduit-connector-sdk v0.4.0
+	github.com/conduitio/conduit-connector-sdk v0.4.3
 	github.com/jaswdr/faker v1.15.0
 	github.com/stretchr/testify v1.8.1
 	go.uber.org/goleak v1.2.0
