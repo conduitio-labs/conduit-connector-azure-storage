@@ -8,7 +8,7 @@ require (
 	github.com/conduitio/conduit-connector-sdk v0.4.0
 	github.com/jaswdr/faker v1.15.0
 	github.com/stretchr/testify v1.8.1
-	go.uber.org/goleak v1.2.0
+	go.uber.org/goleak v1.2.1
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
 )
 
