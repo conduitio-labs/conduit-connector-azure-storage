@@ -3,7 +3,7 @@ module github.com/miquido/conduit-connector-azure-storage
 go 1.18
 
 require (
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.6.1
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.7.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v0.4.1
 	github.com/conduitio/conduit-connector-sdk v0.4.0
 	github.com/jaswdr/faker v1.18.0
