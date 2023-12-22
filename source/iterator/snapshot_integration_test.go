@@ -31,13 +31,13 @@ import (
 
 func TestSnapshotIterator(t *testing.T) {
 	fakerInstance := faker.New()
-	azureBlobServiceClient := helper.NewAzureBlobServiceClient()
+	azureBlobClient := helper.NewAzureBlobClient()
 
-	var containerName = "snapshot-iterator"
+	containerName := "snapshot-iterator"
 
 	t.Run("Empty container", func(t *testing.T) {
 		ctx := context.Background()
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 
 		iterator, err := NewSnapshotIterator(containerClient, position.NewDefaultSnapshotPosition(), fakerInstance.Int32Between(1, 100))
 		require.NoError(t, err)
@@ -68,11 +68,11 @@ func TestSnapshotIterator(t *testing.T) {
 			)
 
 			ctx := context.Background()
-			containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+			containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 			snapshotPosition := position.NewDefaultSnapshotPosition()
 
-			require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-			require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
+			require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+			require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
 
 			iterator, err := NewSnapshotIterator(containerClient, snapshotPosition, tt.maxResults)
 			require.NoError(t, err)
@@ -115,12 +115,12 @@ func TestSnapshotIterator(t *testing.T) {
 		)
 
 		ctx := context.Background()
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 		snapshotPosition := position.NewDefaultSnapshotPosition()
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record3Name, "text/plain", record3Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record3Name, "text/plain", record3Contents))
 
 		iterator, err := NewSnapshotIterator(containerClient, snapshotPosition, 2)
 		require.NoError(t, err)
@@ -166,11 +166,11 @@ func TestSnapshotIterator(t *testing.T) {
 		)
 
 		ctx := context.Background()
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 		snapshotPosition := position.NewDefaultSnapshotPosition()
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
 
 		iterator, err := NewSnapshotIterator(containerClient, snapshotPosition, 100)
 		require.NoError(t, err)
@@ -212,12 +212,12 @@ func TestSnapshotIterator(t *testing.T) {
 		)
 
 		ctx, cancelFunc := context.WithCancel(context.Background())
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 		snapshotPosition := position.NewDefaultSnapshotPosition()
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record3Name, "text/plain", record3Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record3Name, "text/plain", record3Contents))
 
 		iterator, err := NewSnapshotIterator(containerClient, snapshotPosition, 100)
 		require.NoError(t, err)

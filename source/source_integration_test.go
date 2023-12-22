@@ -31,7 +31,7 @@ import (
 func TestSource_FailsWhenConnectionStringIsInvalid(t *testing.T) {
 	ctx := context.Background()
 
-	var cfgRaw = map[string]string{
+	cfgRaw := map[string]string{
 		ConfigKeyConnectionString: "invalid connection string",
 		ConfigKeyContainerName:    "source-integration-tests",
 		ConfigKeyPollingPeriod:    "1500ms",
@@ -52,7 +52,7 @@ func TestSource_FailsWhenConnectionStringIsInvalid(t *testing.T) {
 func TestSource_FailsWhenConnectionCannotBeEstablished(t *testing.T) {
 	ctx := context.Background()
 
-	var cfgRaw = map[string]string{
+	cfgRaw := map[string]string{
 		ConfigKeyConnectionString: "DefaultEndpointsProtocol=http;AccountName=account;AccountKey=QWNjb3VudEtleQ==;BlobEndpoint=http://127.0.0.1:10101/account",
 		ConfigKeyContainerName:    "source-integration-tests",
 		ConfigKeyPollingPeriod:    "1500ms",
@@ -109,7 +109,7 @@ func TestSource_FailsWhenRecordPositionIsInvalid(t *testing.T) {
 		}
 	)
 
-	helper.PrepareContainer(t, helper.NewAzureBlobServiceClient(), containerName)
+	helper.PrepareContainer(t, helper.NewAzureBlobClient(), containerName)
 
 	src := NewSource()
 
@@ -137,7 +137,8 @@ func TestSource_ReadsContainerItemsWithSnapshotIteratorAndThenReadsAddedItemsWit
 		}
 	)
 
-	containerClient := helper.PrepareContainer(t, helper.NewAzureBlobServiceClient(), containerName)
+	azureBlobClient := helper.NewAzureBlobClient()
+	helper.PrepareContainer(t, azureBlobClient, containerName)
 
 	var (
 		alreadyExistingBlob1Name        = "already-existing-1.txt"
@@ -153,8 +154,8 @@ func TestSource_ReadsContainerItemsWithSnapshotIteratorAndThenReadsAddedItemsWit
 		createdWhileWorking1Contents    = fakerInstance.Lorem().Sentence(16)
 	)
 
-	require.NoError(t, helper.CreateBlob(containerClient, alreadyExistingBlob1Name, alreadyExistingBlob1ContentType, alreadyExistingBlob1Contents))
-	require.NoError(t, helper.CreateBlob(containerClient, alreadyExistingBlob2Name, alreadyExistingBlob2ContentType, alreadyExistingBlob2Contents))
+	require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, alreadyExistingBlob1Name, alreadyExistingBlob1ContentType, alreadyExistingBlob1Contents))
+	require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, alreadyExistingBlob2Name, alreadyExistingBlob2ContentType, alreadyExistingBlob2Contents))
 
 	time.Sleep(time.Second)
 
@@ -190,7 +191,7 @@ func TestSource_ReadsContainerItemsWithSnapshotIteratorAndThenReadsAddedItemsWit
 	t.Run("Secondly, CDC iterator runs and reads all blobs created meanwhile", func(t *testing.T) {
 		// Create file while snapshot iterator is working
 		// This file should not be included in the results
-		require.NoError(t, helper.CreateBlob(containerClient, createdWhileWorking1Name, createdWhileWorking1ContentType, createdWhileWorking1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, createdWhileWorking1Name, createdWhileWorking1ContentType, createdWhileWorking1Contents))
 
 		// No new record is available until 1 polling period passes
 		record1, err := src.Read(ctx)
@@ -227,7 +228,7 @@ func TestSource_SnapshotIteratorReadsEmptyContainerAndThenSwitchedToCDCIterator(
 		}
 	)
 
-	helper.PrepareContainer(t, helper.NewAzureBlobServiceClient(), containerName)
+	helper.PrepareContainer(t, helper.NewAzureBlobClient(), containerName)
 
 	src := NewSource().(*Source)
 
@@ -272,7 +273,8 @@ func TestSource_CDCIteratorOmitsAlreadyReadItems(t *testing.T) {
 		}
 	)
 
-	containerClient := helper.PrepareContainer(t, helper.NewAzureBlobServiceClient(), containerName)
+	azureBlobClient := helper.NewAzureBlobClient()
+	helper.PrepareContainer(t, azureBlobClient, containerName)
 
 	var (
 		alreadyExistingBlob1Name        = "already-existing-1.txt"
@@ -288,8 +290,8 @@ func TestSource_CDCIteratorOmitsAlreadyReadItems(t *testing.T) {
 		createdWhileWorking1Contents    = fakerInstance.Lorem().Sentence(16)
 	)
 
-	require.NoError(t, helper.CreateBlob(containerClient, alreadyExistingBlob1Name, alreadyExistingBlob1ContentType, alreadyExistingBlob1Contents))
-	require.NoError(t, helper.CreateBlob(containerClient, alreadyExistingBlob2Name, alreadyExistingBlob2ContentType, alreadyExistingBlob2Contents))
+	require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, alreadyExistingBlob1Name, alreadyExistingBlob1ContentType, alreadyExistingBlob1Contents))
+	require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, alreadyExistingBlob2Name, alreadyExistingBlob2ContentType, alreadyExistingBlob2Contents))
 
 	time.Sleep(time.Second)
 
@@ -298,7 +300,7 @@ func TestSource_CDCIteratorOmitsAlreadyReadItems(t *testing.T) {
 
 	time.Sleep(time.Second)
 
-	require.NoError(t, helper.CreateBlob(containerClient, createdWhileWorking1Name, createdWhileWorking1ContentType, createdWhileWorking1Contents))
+	require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, createdWhileWorking1Name, createdWhileWorking1ContentType, createdWhileWorking1Contents))
 
 	src := NewSource().(*Source)
 

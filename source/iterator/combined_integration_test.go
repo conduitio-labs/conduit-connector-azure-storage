@@ -32,14 +32,14 @@ import (
 func TestCombinedIterator(t *testing.T) {
 	ctx := context.Background()
 	fakerInstance := faker.New()
-	azureBlobServiceClient := helper.NewAzureBlobServiceClient()
+	azureBlobClient := helper.NewAzureBlobClient()
 
-	var containerName = "combined-iterator"
+	containerName := "combined-iterator"
 
 	t.Run("Empty container", func(t *testing.T) {
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		helper.PrepareContainer(t, azureBlobClient, containerName)
 
-		iterator, err := NewCombinedIterator(time.Millisecond*500, containerClient, fakerInstance.Int32Between(1, 100), position.NewDefaultSnapshotPosition())
+		iterator, err := NewCombinedIterator(time.Millisecond*500, azureBlobClient, containerName, fakerInstance.Int32Between(1, 100), position.NewDefaultSnapshotPosition())
 		require.NoError(t, err)
 
 		// Let the Goroutine finish
@@ -64,19 +64,19 @@ func TestCombinedIterator(t *testing.T) {
 			record3Contents = fakerInstance.Lorem().Sentence(16)
 		)
 
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		helper.PrepareContainer(t, azureBlobClient, containerName)
 		snapshotPosition := position.NewDefaultSnapshotPosition()
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
 
-		iterator, err := NewCombinedIterator(time.Millisecond*100, containerClient, 100, snapshotPosition)
+		iterator, err := NewCombinedIterator(time.Millisecond*100, azureBlobClient, containerName, 100, snapshotPosition)
 		require.NoError(t, err)
 
 		// Let the Goroutine run
 		time.Sleep(time.Second)
 
-		require.NoError(t, helper.CreateBlob(containerClient, record3Name, "text/plain", record3Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record3Name, "text/plain", record3Contents))
 
 		require.True(t, iterator.HasNext(ctx))
 		record1, err := iterator.Next(ctx)
