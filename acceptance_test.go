@@ -41,7 +41,7 @@ func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T, op
 	return record
 }
 
-func (d *CustomConfigurableAcceptanceTestDriver) WriteToSource(t *testing.T, records []sdk.Record) (results []sdk.Record) {
+func (d *CustomConfigurableAcceptanceTestDriver) WriteToSource(_ *testing.T, records []sdk.Record) (results []sdk.Record) {
 	for _, record := range records {
 		_ = helper.CreateBlob(
 			d.containerClient,
