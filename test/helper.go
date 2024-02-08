@@ -17,13 +17,13 @@ package test
 import (
 	"context"
 	"fmt"
-	"strings"
 	"sync"
 	"testing"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/azcore/streaming"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -37,8 +37,8 @@ const (
 )
 
 var (
-	azureBlobServiceClient          *azblob.ServiceClient
-	createNewAzureBlobServiceClient sync.Once
+	azureBlobClient          *azblob.Client
+	createNewAzureBlobClient sync.Once
 
 	// https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azurite?tabs=docker-hub#http-connection-strings
 	connectionString = fmt.Sprintf(
@@ -54,53 +54,43 @@ func GetConnectionString() string {
 	return connectionString
 }
 
-func NewAzureBlobServiceClient() *azblob.ServiceClient {
-	createNewAzureBlobServiceClient.Do(func() {
+func NewAzureBlobClient() *azblob.Client {
+	createNewAzureBlobClient.Do(func() {
 		var err error
-		azureBlobServiceClient, err = azblob.NewServiceClientFromConnectionString(connectionString, nil)
+		azureBlobClient, err = azblob.NewClientFromConnectionString(connectionString, nil)
 
 		if err != nil {
 			panic(fmt.Errorf("failed to create Azure Blob Service Client: %w", err))
 		}
 	})
 
-	return azureBlobServiceClient
+	return azureBlobClient
 }
 
-func PrepareContainer(t *testing.T, serviceClient *azblob.ServiceClient, containerName string) *azblob.ContainerClient {
+func PrepareContainer(t *testing.T, client *azblob.Client, containerName string) *container.Client {
 	t.Cleanup(func() {
-		_, _ = serviceClient.DeleteContainer(context.Background(), containerName, nil)
+		_, _ = client.DeleteContainer(context.Background(), containerName, nil)
 	})
 
-	_, err := serviceClient.CreateContainer(context.Background(), containerName, nil)
+	_, err := client.CreateContainer(context.Background(), containerName, nil)
 	require.NoError(t, err)
 
-	containerClient, err := serviceClient.NewContainerClient(containerName)
-	require.NoError(t, err)
-
-	return containerClient
+	return client.ServiceClient().NewContainerClient(containerName)
 }
 
-func CreateBlob(containerClient *azblob.ContainerClient, blobName, contentType, contents string) error {
-	blockBlobClient, err := containerClient.NewBlockBlobClient(blobName)
-	if err != nil {
-		return err
-	}
-
-	_, err = blockBlobClient.Upload(
+func CreateBlob(client *azblob.Client, containerName, blobName, contentType, contents string) error {
+	_, err := client.UploadBuffer(
 		context.Background(),
-		streaming.NopCloser(strings.NewReader(contents)),
-		&azblob.BlockBlobUploadOptions{
-			HTTPHeaders: &azblob.BlobHTTPHeaders{
+		containerName,
+		blobName,
+		[]byte(contents),
+		&azblob.UploadBufferOptions{
+			HTTPHeaders: &blob.HTTPHeaders{
 				BlobContentType: to.Ptr(contentType),
 			},
 		},
 	)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func AssertRecordEquals(t *testing.T, record sdk.Record, fileName, contentType, contents string) bool {

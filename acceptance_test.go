@@ -29,7 +29,8 @@ import (
 type CustomConfigurableAcceptanceTestDriver struct {
 	sdk.ConfigurableAcceptanceTestDriver
 
-	containerClient *azblob.ContainerClient
+	blobClient    *azblob.Client
+	containerName string
 }
 
 func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T, op sdk.Operation) sdk.Record {
@@ -44,7 +45,8 @@ func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T, op
 func (d *CustomConfigurableAcceptanceTestDriver) WriteToSource(_ *testing.T, records []sdk.Record) (results []sdk.Record) {
 	for _, record := range records {
 		_ = helper.CreateBlob(
-			d.containerClient,
+			d.blobClient,
+			d.containerName,
 			string(record.Key.Bytes()),
 			"text/plain",
 			string(record.Payload.After.Bytes()),
@@ -91,7 +93,10 @@ func TestAcceptance(t *testing.T) {
 	}
 
 	testDriver.ConfigurableAcceptanceTestDriver.Config.BeforeTest = func(t *testing.T) {
-		testDriver.containerClient = helper.PrepareContainer(t, helper.NewAzureBlobServiceClient(), sourceConfig[source.ConfigKeyContainerName])
+		blobClient := helper.NewAzureBlobClient()
+		helper.PrepareContainer(t, blobClient, sourceConfig[source.ConfigKeyContainerName])
+		testDriver.blobClient = blobClient
+		testDriver.containerName = sourceConfig[source.ConfigKeyContainerName]
 	}
 
 	sdk.AcceptanceTest(t, &testDriver)

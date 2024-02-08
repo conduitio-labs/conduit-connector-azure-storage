@@ -30,13 +30,13 @@ import (
 
 func TestCDCIterator(t *testing.T) {
 	fakerInstance := faker.New()
-	azureBlobServiceClient := helper.NewAzureBlobServiceClient()
+	azureBlobClient := helper.NewAzureBlobClient()
 
-	var containerName = "cdc-iterator"
+	containerName := "cdc-iterator"
 
 	t.Run("Empty container", func(t *testing.T) {
 		ctx := context.Background()
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 
 		iterator, err := NewCDCIterator(time.Millisecond*500, containerClient, time.Now(), fakerInstance.Int32Between(1, 100))
 		require.NoError(t, err)
@@ -67,13 +67,13 @@ func TestCDCIterator(t *testing.T) {
 			)
 
 			ctx := context.Background()
-			containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+			containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 
 			iterator, err := NewCDCIterator(time.Millisecond*100, containerClient, time.Now().AddDate(0, 0, -1), tt.maxResults)
 			require.NoError(t, err)
 
-			require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-			require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
+			require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+			require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
 
 			// Let the Pooling Period pass and iterator to collect blobs
 			time.Sleep(time.Millisecond * 500)
@@ -109,11 +109,11 @@ func TestCDCIterator(t *testing.T) {
 		)
 
 		ctx := context.Background()
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record3Name, "text/plain", record3Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record3Name, "text/plain", record3Contents))
 
 		iterator, err := NewCDCIterator(time.Millisecond*100, containerClient, time.Now().AddDate(0, 0, -1), 2)
 		require.NoError(t, err)
@@ -158,10 +158,10 @@ func TestCDCIterator(t *testing.T) {
 		)
 
 		ctx := context.Background()
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
 
 		iterator, err := NewCDCIterator(time.Millisecond*100, containerClient, time.Now().AddDate(0, 0, -1), 100)
 		require.NoError(t, err)
@@ -201,10 +201,10 @@ func TestCDCIterator(t *testing.T) {
 		)
 
 		ctx, cancelFunc := context.WithCancel(context.Background())
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
-		require.NoError(t, helper.CreateBlob(containerClient, record2Name, "text/plain", record2Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record2Name, "text/plain", record2Contents))
 
 		iterator, err := NewCDCIterator(time.Millisecond*100, containerClient, time.Now().AddDate(0, 0, -1), 100)
 		require.NoError(t, err)
@@ -243,9 +243,9 @@ func TestCDCIterator(t *testing.T) {
 		)
 
 		ctx := context.Background()
-		containerClient := helper.PrepareContainer(t, azureBlobServiceClient, containerName)
+		containerClient := helper.PrepareContainer(t, azureBlobClient, containerName)
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1Contents))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1Contents))
 
 		iterator, err := NewCDCIterator(time.Millisecond*100, containerClient, time.Now().AddDate(0, 0, -1), 100)
 		require.NoError(t, err)
@@ -262,7 +262,7 @@ func TestCDCIterator(t *testing.T) {
 		// Update the blob
 		time.Sleep(time.Second)
 
-		require.NoError(t, helper.CreateBlob(containerClient, record1Name, "text/plain", record1ContentsUpdated))
+		require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, record1Name, "text/plain", record1ContentsUpdated))
 
 		record2, err := iterator.Next(ctx)
 		require.NoError(t, err)

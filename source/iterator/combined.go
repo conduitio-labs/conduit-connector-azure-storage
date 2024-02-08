@@ -20,7 +20,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
 )
@@ -29,7 +29,7 @@ var ErrUnsupportedIterator = errors.New("unsupported iterator")
 
 type CombinedIterator struct {
 	pollingPeriod time.Duration
-	client        *azblob.ContainerClient
+	client        *container.Client
 	maxResults    int32
 
 	iterator Iterator
@@ -37,7 +37,7 @@ type CombinedIterator struct {
 
 func NewCombinedIterator(
 	pollingPeriod time.Duration,
-	client *azblob.ContainerClient,
+	client *container.Client,
 	maxResults int32,
 	p position.Position,
 ) (c *CombinedIterator, err error) {

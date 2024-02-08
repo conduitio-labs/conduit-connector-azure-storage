@@ -26,7 +26,7 @@ import (
 
 func TestNewCombinedIterator(t *testing.T) {
 	t.Run("Fail to create new iterator with invalid type", func(t *testing.T) {
-		iterator, err := NewCombinedIterator(time.Millisecond, nil, 1, position.Position{
+		iterator, err := NewCombinedIterator(time.Millisecond, nil, "", 1, position.Position{
 			Type: 2,
 		})
 

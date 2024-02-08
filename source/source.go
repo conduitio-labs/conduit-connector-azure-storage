@@ -18,11 +18,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 	"reflect"
 	"strconv"
 
-	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/service"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/miquido/conduit-connector-azure-storage/source/iterator"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
@@ -75,26 +74,19 @@ func (s *Source) Configure(_ context.Context, cfgRaw map[string]string) (err err
 }
 
 func (s *Source) Open(ctx context.Context, rp sdk.Position) error {
-	// Create account connection client
-	serviceClient, err := azblob.NewServiceClientFromConnectionString(s.config.ConnectionString, nil)
+	serviceClient, err := service.NewClientFromConnectionString(s.config.ConnectionString, nil)
 	if err != nil {
 		return fmt.Errorf("connector open error: could not create account connection client: %w", err)
 	}
 
 	// Test account connection
-	accountInfo, err := serviceClient.GetAccountInfo(ctx, nil)
+	_, err = serviceClient.GetAccountInfo(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("connector open error: could not establish a connection: %w", err)
 	}
-	if accountInfo.RawResponse.StatusCode != http.StatusOK {
-		return fmt.Errorf("connector open error: could not establish a connection: unexpected response status %d", accountInfo.RawResponse.StatusCode)
-	}
 
 	// Create container client
-	containerClient, err := serviceClient.NewContainerClient(s.config.ContainerName)
-	if err != nil {
-		return fmt.Errorf("connector open error: could not create container connection client: %w", err)
-	}
+	containerClient := serviceClient.NewContainerClient(s.config.ContainerName)
 
 	// Check if container exists
 	_, err = containerClient.GetProperties(ctx, nil)
