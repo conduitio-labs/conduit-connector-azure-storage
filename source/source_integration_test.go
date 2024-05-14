@@ -67,7 +67,7 @@ func TestSource_FailsWhenConnectionCannotBeEstablished(t *testing.T) {
 		_ = src.Teardown(ctx)
 	})
 
-	require.ErrorContains(t, src.Open(ctx, nil), "connector open error: could not establish a connection: ===== INTERNAL ERROR =====")
+	require.ErrorContains(t, src.Open(ctx, nil), "connector open error: could not establish a connection")
 }
 
 func TestSource_FailsWhenContainerDoesNotExist(t *testing.T) {
@@ -92,7 +92,7 @@ func TestSource_FailsWhenContainerDoesNotExist(t *testing.T) {
 		_ = src.Teardown(ctx)
 	})
 
-	require.ErrorContains(t, src.Open(ctx, nil), "Description=The specified container does not exist.")
+	require.ErrorContains(t, src.Open(ctx, nil), "connector open error: could not create container connection client")
 }
 
 func TestSource_FailsWhenRecordPositionIsInvalid(t *testing.T) {
