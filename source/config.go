@@ -21,11 +21,11 @@ import (
 )
 
 const (
-	ConfigKeyConnectionString = "connectionString"
-	ConfigKeyContainerName    = "containerName"
+	ConfigKeyConnectionString = "connection_string"
+	ConfigKeyContainerName    = "container_name"
 
-	ConfigKeyPollingPeriod = "pollingPeriod"
-	ConfigKeyMaxResults    = "maxResults"
+	ConfigKeyPollingPeriod = "polling_period"
+	ConfigKeyMaxResults    = "max_results"
 )
 
 type Config struct {
