@@ -19,7 +19,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"strconv"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/service"
 	sdk "github.com/conduitio/conduit-connector-sdk"
@@ -40,37 +39,15 @@ func NewSource() sdk.Source {
 
 // Parameters is a map of named Parameters that describe how to configure the Source.
 func (s *Source) Parameters() map[string]sdk.Parameter {
-	return map[string]sdk.Parameter{
-		ConfigKeyConnectionString: {
-			Default:     "",
-			Required:    true,
-			Description: "The Azure Storage connection string.",
-		},
-		ConfigKeyContainerName: {
-			Default:     "",
-			Required:    true,
-			Description: "The name of the container to monitor.",
-		},
-		ConfigKeyPollingPeriod: {
-			Default:     DefaultPollingPeriod,
-			Required:    false,
-			Description: "The polling period for the CDC mode, formatted as a time.Duration string.",
-		},
-		ConfigKeyMaxResults: {
-			Default:     strconv.FormatInt(int64(DefaultMaxResults), 32),
-			Required:    false,
-			Description: "The maximum number of items, per page, when reading container's items.",
-		},
-	}
+	return s.config.Parameters()
 }
 
-func (s *Source) Configure(_ context.Context, cfgRaw map[string]string) (err error) {
-	s.config, err = ParseConfig(cfgRaw)
+func (s *Source) Configure(_ context.Context, config map[string]string) error {
+	err := sdk.Util.ParseConfig(config, &s.config)
 	if err != nil {
-		return fmt.Errorf("configuration error: %w", err)
+		return err
 	}
-
-	return nil
+	return s.config.Validate()
 }
 
 func (s *Source) Open(ctx context.Context, rp sdk.Position) error {
