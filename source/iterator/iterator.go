@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:generate moq -out iterator_moq_test.go . Iterator
+
 package iterator
 
 import (
@@ -20,7 +22,6 @@ import (
 	sdk "github.com/conduitio/conduit-connector-sdk"
 )
 
-//go:generate moq -out iterator_moq_test.go . Iterator
 type Iterator interface {
 	// HasNext indicates whether there is new sdk.Record available (`true`) or not (`false`)
 	HasNext(ctx context.Context) bool

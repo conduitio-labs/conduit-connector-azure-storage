@@ -1,6 +1,3 @@
-run:
-  go: '1.18' # https://github.com/golangci/golangci-lint/issues/2649
-
 linters-settings:
   gofmt:
     simplify: false
