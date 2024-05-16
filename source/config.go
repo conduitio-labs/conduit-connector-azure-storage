@@ -17,7 +17,6 @@
 package source
 
 import (
-	"errors"
 	"time"
 )
 
@@ -38,11 +37,4 @@ type Config struct {
 	PollingPeriod time.Duration `json:"polling_period" default:"1s"`
 	// The maximum number of items, per page, when reading container's items.
 	MaxResults int32 `json:"max_results" default:"5000" validate:"gt=0,lt=5001"`
-}
-
-func (c Config) Validate() error {
-	var errs []error
-
-	// Include more validations if needed
-	return errors.Join(errs...)
 }

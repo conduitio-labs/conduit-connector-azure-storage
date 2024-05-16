@@ -43,11 +43,7 @@ func (s *Source) Parameters() map[string]sdk.Parameter {
 }
 
 func (s *Source) Configure(_ context.Context, config map[string]string) error {
-	err := sdk.Util.ParseConfig(config, &s.config)
-	if err != nil {
-		return err
-	}
-	return s.config.Validate()
+	return sdk.Util.ParseConfig(config, &s.config)
 }
 
 func (s *Source) Open(ctx context.Context, rp sdk.Position) error {

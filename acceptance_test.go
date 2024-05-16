@@ -28,7 +28,6 @@ import (
 
 type CustomConfigurableAcceptanceTestDriver struct {
 	sdk.ConfigurableAcceptanceTestDriver
-
 	blobClient    *azblob.Client
 	containerName string
 }

@@ -227,3 +227,5 @@ $RECYCLE.BIN/
 ### Project ###
 # Binary built with `make build`
 /conduit-connector-azure-storage
+
+.editorconfig
