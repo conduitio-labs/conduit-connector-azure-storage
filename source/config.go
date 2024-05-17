@@ -21,20 +21,20 @@ import (
 )
 
 const (
-	ConfigKeyConnectionString = "connection_string"
-	ConfigKeyContainerName    = "container_name"
+	ConfigKeyConnectionString = "connectionString"
+	ConfigKeyContainerName    = "containerName"
 
-	ConfigKeyPollingPeriod = "polling_period"
-	ConfigKeyMaxResults    = "max_results"
+	ConfigKeyPollingPeriod = "pollingPeriod"
+	ConfigKeyMaxResults    = "maxResults"
 )
 
 type Config struct {
 	// The Azure Storage connection string.
-	ConnectionString string `json:"connection_string" validate:"required"`
+	ConnectionString string `json:"connectionString" validate:"required"`
 	// The name of the container to monitor.
-	ContainerName string `json:"container_name" validate:"required"`
+	ContainerName string `json:"containerName" validate:"required"`
 	// The polling period for the CDC mode, formatted as a time.Duration string.
-	PollingPeriod time.Duration `json:"polling_period" default:"1s"`
+	PollingPeriod time.Duration `json:"pollingPeriod" default:"1s"`
 	// The maximum number of items, per page, when reading container's items.
-	MaxResults int32 `json:"max_results" default:"5000" validate:"gt=0,lt=5001"`
+	MaxResults int32 `json:"maxResults" default:"5000" validate:"gt=0,lt=5001"`
 }

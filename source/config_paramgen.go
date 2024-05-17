@@ -9,7 +9,7 @@ import (
 
 func (Config) Parameters() map[string]sdk.Parameter {
 	return map[string]sdk.Parameter{
-		"connection_string": {
+		"connectionString": {
 			Default:     "",
 			Description: "The Azure Storage connection string.",
 			Type:        sdk.ParameterTypeString,
@@ -17,7 +17,7 @@ func (Config) Parameters() map[string]sdk.Parameter {
 				sdk.ValidationRequired{},
 			},
 		},
-		"container_name": {
+		"containerName": {
 			Default:     "",
 			Description: "The name of the container to monitor.",
 			Type:        sdk.ParameterTypeString,
@@ -25,7 +25,7 @@ func (Config) Parameters() map[string]sdk.Parameter {
 				sdk.ValidationRequired{},
 			},
 		},
-		"max_results": {
+		"maxResults": {
 			Default:     "5000",
 			Description: "The maximum number of items, per page, when reading container's items.",
 			Type:        sdk.ParameterTypeInt,
@@ -34,7 +34,7 @@ func (Config) Parameters() map[string]sdk.Parameter {
 				sdk.ValidationLessThan{Value: 5001},
 			},
 		},
-		"polling_period": {
+		"pollingPeriod": {
 			Default:     "1s",
 			Description: "The polling period for the CDC mode, formatted as a time.Duration string.",
 			Type:        sdk.ParameterTypeDuration,
