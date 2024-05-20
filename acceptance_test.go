@@ -33,6 +33,8 @@ type CustomConfigurableAcceptanceTestDriver struct {
 }
 
 func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T, op sdk.Operation) sdk.Record {
+	t.Helper()
+
 	record := d.ConfigurableAcceptanceTestDriver.GenerateRecord(t, op)
 
 	// Override Key
@@ -95,6 +97,8 @@ func TestAcceptance(t *testing.T) {
 	}
 
 	testDriver.ConfigurableAcceptanceTestDriver.Config.BeforeTest = func(t *testing.T) {
+		t.Helper()
+
 		blobClient := helper.NewAzureBlobClient()
 		helper.PrepareContainer(t, blobClient, sourceConfig[source.ConfigKeyContainerName])
 		testDriver.blobClient = blobClient

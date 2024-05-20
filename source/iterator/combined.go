@@ -156,7 +156,7 @@ func (c *CombinedIterator) switchToCDCIterator() (err error) {
 	}
 }
 
-// convertToCDCPosition changes Position type to CDC
+// convertToCDCPosition changes Position type to CDC.
 func convertToCDCPosition(p sdk.Position) (sdk.Position, error) {
 	cdcPos, err := position.NewFromRecordPosition(p)
 	if err != nil {

@@ -58,7 +58,6 @@ func NewAzureBlobClient() *azblob.Client {
 	createNewAzureBlobClient.Do(func() {
 		var err error
 		azureBlobClient, err = azblob.NewClientFromConnectionString(connectionString, nil)
-
 		if err != nil {
 			panic(fmt.Errorf("failed to create Azure Blob Service Client: %w", err))
 		}
@@ -68,6 +67,8 @@ func NewAzureBlobClient() *azblob.Client {
 }
 
 func PrepareContainer(t *testing.T, client *azblob.Client, containerName string) *container.Client {
+	t.Helper()
+
 	t.Cleanup(func() {
 		_, _ = client.DeleteContainer(context.Background(), containerName, nil)
 	})
@@ -94,6 +95,8 @@ func CreateBlob(client *azblob.Client, containerName, blobName, contentType, con
 }
 
 func AssertRecordEquals(t *testing.T, record sdk.Record, fileName, contentType, contents string) bool {
+	t.Helper()
+
 	return assert.NotNil(t, record.Key, "Record Key is not set.") &&
 		assert.NotNil(t, record.Payload, "Record Payload is not set.") &&
 		assert.Equal(t, fileName, string(record.Key.Bytes()), "Record name does not match.") &&

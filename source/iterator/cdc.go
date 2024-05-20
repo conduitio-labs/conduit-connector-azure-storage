@@ -96,6 +96,8 @@ func (w *CDCIterator) Stop() {
 }
 
 // producer reads the container and reports all file changes since last time.
+//
+//nolint:funlen,gocognit // this function is long, but it's a single responsibility function
 func (w *CDCIterator) producer() error {
 	defer close(w.buffer)
 

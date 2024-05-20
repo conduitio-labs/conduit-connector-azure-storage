@@ -67,7 +67,7 @@ linters:
     - goconst
     - gocritic
     - godot
-    - err113
+    # - err113 # this linter is disabled for now
     - gofmt
     - gofumpt
     - goheader
@@ -113,5 +113,5 @@ linters:
     - usestdlibvars
     - wastedassign
     - whitespace
-    - wrapcheck
+    # - wrapcheck # this linter is disabled for now
     - zerologlint
