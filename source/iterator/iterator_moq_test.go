@@ -15,25 +15,25 @@ var _ Iterator = &IteratorMock{}
 
 // IteratorMock is a mock implementation of Iterator.
 //
-// 	func TestSomethingThatUsesIterator(t *testing.T) {
+//	func TestSomethingThatUsesIterator(t *testing.T) {
 //
-// 		// make and configure a mocked Iterator
-// 		mockedIterator := &IteratorMock{
-// 			HasNextFunc: func(ctx context.Context) bool {
-// 				panic("mock out the HasNext method")
-// 			},
-// 			NextFunc: func(ctx context.Context) (sdk.Record, error) {
-// 				panic("mock out the Next method")
-// 			},
-// 			StopFunc: func()  {
-// 				panic("mock out the Stop method")
-// 			},
-// 		}
+//		// make and configure a mocked Iterator
+//		mockedIterator := &IteratorMock{
+//			HasNextFunc: func(ctx context.Context) bool {
+//				panic("mock out the HasNext method")
+//			},
+//			NextFunc: func(ctx context.Context) (sdk.Record, error) {
+//				panic("mock out the Next method")
+//			},
+//			StopFunc: func()  {
+//				panic("mock out the Stop method")
+//			},
+//		}
 //
-// 		// use mockedIterator in code that requires Iterator
-// 		// and then make assertions.
+//		// use mockedIterator in code that requires Iterator
+//		// and then make assertions.
 //
-// 	}
+//	}
 type IteratorMock struct {
 	// HasNextFunc mocks the HasNext method.
 	HasNextFunc func(ctx context.Context) bool
@@ -83,7 +83,8 @@ func (mock *IteratorMock) HasNext(ctx context.Context) bool {
 
 // HasNextCalls gets all the calls that were made to HasNext.
 // Check the length with:
-//     len(mockedIterator.HasNextCalls())
+//
+//	len(mockedIterator.HasNextCalls())
 func (mock *IteratorMock) HasNextCalls() []struct {
 	Ctx context.Context
 } {
@@ -114,7 +115,8 @@ func (mock *IteratorMock) Next(ctx context.Context) (sdk.Record, error) {
 
 // NextCalls gets all the calls that were made to Next.
 // Check the length with:
-//     len(mockedIterator.NextCalls())
+//
+//	len(mockedIterator.NextCalls())
 func (mock *IteratorMock) NextCalls() []struct {
 	Ctx context.Context
 } {
@@ -142,7 +144,8 @@ func (mock *IteratorMock) Stop() {
 
 // StopCalls gets all the calls that were made to Stop.
 // Check the length with:
-//     len(mockedIterator.StopCalls())
+//
+//	len(mockedIterator.StopCalls())
 func (mock *IteratorMock) StopCalls() []struct {
 } {
 	var calls []struct {

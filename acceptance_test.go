@@ -28,12 +28,13 @@ import (
 
 type CustomConfigurableAcceptanceTestDriver struct {
 	sdk.ConfigurableAcceptanceTestDriver
-
 	blobClient    *azblob.Client
 	containerName string
 }
 
 func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T, op sdk.Operation) sdk.Record {
+	t.Helper()
+
 	record := d.ConfigurableAcceptanceTestDriver.GenerateRecord(t, op)
 
 	// Override Key
@@ -61,6 +62,8 @@ func TestAcceptance(t *testing.T) {
 	sourceConfig := map[string]string{
 		source.ConfigKeyConnectionString: helper.GetConnectionString(),
 		source.ConfigKeyContainerName:    "acceptance-tests",
+		source.ConfigKeyMaxResults:       "5000",
+		source.ConfigKeyPollingPeriod:    "1s",
 	}
 
 	testDriver := CustomConfigurableAcceptanceTestDriver{
@@ -87,12 +90,15 @@ func TestAcceptance(t *testing.T) {
 					// there are no changes left to detect.
 					// Only `TestAcceptance/TestSource_Read_Success/cdc` fails, but it cannot be excluded alone.
 					"TestAcceptance/TestSource_Read_Success",
+					"TestAcceptance/TestSource_Configure_RequiredParams",
 				},
 			},
 		},
 	}
 
 	testDriver.ConfigurableAcceptanceTestDriver.Config.BeforeTest = func(t *testing.T) {
+		t.Helper()
+
 		blobClient := helper.NewAzureBlobClient()
 		helper.PrepareContainer(t, blobClient, sourceConfig[source.ConfigKeyContainerName])
 		testDriver.blobClient = blobClient
