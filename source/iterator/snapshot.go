@@ -25,6 +25,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
 	"gopkg.in/tomb.v2"
@@ -47,7 +48,7 @@ func NewSnapshotIterator(
 			MaxResults: &maxResults,
 		}),
 		maxLastModified: p.Timestamp,
-		buffer:          make(chan sdk.Record, 1),
+		buffer:          make(chan opencdc.Record, 1),
 		tomb:            tomb.Tomb{},
 	}
 
@@ -60,7 +61,7 @@ type SnapshotIterator struct {
 	client          *container.Client
 	paginator       *runtime.Pager[azblob.ListBlobsFlatResponse]
 	maxLastModified time.Time
-	buffer          chan sdk.Record
+	buffer          chan opencdc.Record
 	tomb            tomb.Tomb
 }
 
@@ -68,11 +69,11 @@ func (w *SnapshotIterator) HasNext(_ context.Context) bool {
 	return w.tomb.Alive() || len(w.buffer) > 0
 }
 
-func (w *SnapshotIterator) Next(ctx context.Context) (sdk.Record, error) {
+func (w *SnapshotIterator) Next(ctx context.Context) (opencdc.Record, error) {
 	select {
 	case r, active := <-w.buffer:
 		if !active {
-			return sdk.Record{}, ErrSnapshotIteratorIsStopped
+			return opencdc.Record{}, ErrSnapshotIteratorIsStopped
 		}
 
 		return r, nil
@@ -83,10 +84,10 @@ func (w *SnapshotIterator) Next(ctx context.Context) (sdk.Record, error) {
 			err = ErrSnapshotIteratorIsStopped
 		}
 
-		return sdk.Record{}, err
+		return opencdc.Record{}, err
 
 	case <-ctx.Done():
-		return sdk.Record{}, ctx.Err()
+		return opencdc.Record{}, ctx.Err()
 	}
 }
 
@@ -128,7 +129,7 @@ func (w *SnapshotIterator) producer() error {
 			// Send out the record if possible
 			select {
 			case w.buffer <- record:
-				// sdk.Record was sent successfully
+				// opencdc.Record was sent successfully
 
 			case <-w.tomb.Dying():
 				return nil
@@ -138,8 +139,8 @@ func (w *SnapshotIterator) producer() error {
 	return nil
 }
 
-// createSnapshotRecord converts blob item into sdk.Record with item's contents.
-func (w *SnapshotIterator) createSnapshotRecord(ctx context.Context, item *container.BlobItem, resp azblob.DownloadStreamResponse) (sdk.Record, error) {
+// createSnapshotRecord converts blob item into opencdc.Record with item's contents.
+func (w *SnapshotIterator) createSnapshotRecord(ctx context.Context, item *container.BlobItem, resp azblob.DownloadStreamResponse) (opencdc.Record, error) {
 	// Try to read item's contents
 	reader := resp.NewRetryReader(ctx, &blob.RetryReaderOptions{
 		MaxRetries: 3,
@@ -148,7 +149,7 @@ func (w *SnapshotIterator) createSnapshotRecord(ctx context.Context, item *conta
 
 	rawBody, err := io.ReadAll(reader)
 	if err != nil {
-		return sdk.Record{}, err
+		return opencdc.Record{}, err
 	}
 
 	// Prepare the record position
@@ -156,15 +157,15 @@ func (w *SnapshotIterator) createSnapshotRecord(ctx context.Context, item *conta
 
 	recordPosition, err := p.ToRecordPosition()
 	if err != nil {
-		return sdk.Record{}, err
+		return opencdc.Record{}, err
 	}
 
-	// Prepare the sdk.Record
-	metadata := make(sdk.Metadata)
+	// Prepare the opencdc.Record
+	metadata := make(opencdc.Metadata)
 	metadata.SetCreatedAt(*item.Properties.CreationTime)
 	metadata["azure-storage.content-type"] = *item.Properties.ContentType
 
 	return sdk.Util.Source.NewRecordSnapshot(
-		recordPosition, metadata, sdk.RawData(*item.Name), sdk.RawData(rawBody),
+		recordPosition, metadata, opencdc.RawData(*item.Name), opencdc.RawData(rawBody),
 	), nil
 }

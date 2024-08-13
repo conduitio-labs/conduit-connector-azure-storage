@@ -22,10 +22,10 @@ When interrupted, after restarted, it iterates all over container again.
 After Snapshot reading is finished, connector switches to **CDC mode**.
 In this mode, connector monitors the container each `pollingPeriod` period and notifies about changes detected.
 The iterator stores the last modification timestamp of the files iterated in the previous cycle. When detecting new changes, this timestamp is used to discard files created before it.
-When interrupted, after restarted, it iterates using the timestamp stored in sdk.Position, passed to source's Open method.
+When interrupted, after restarted, it iterates using the timestamp stored in opencdc.Position, passed to source's Open method.
 
 Both iterators paginate over the container via [List Blobs](https://docs.microsoft.com/rest/api/storageservices/list-blobs) query, with up to `maxResults` items per page, to read the list of available items and their metadata (`Last-Modified` and `Content-Type`).
-When creating the sdk.Record, the contents of the file is additionally requested via [Get Blob](https://docs.microsoft.com/rest/api/storageservices/get-blob) query.
+When creating the opencdc.Record, the contents of the file is additionally requested via [Get Blob](https://docs.microsoft.com/rest/api/storageservices/get-blob) query.
 
 ### Supported storage changes
 

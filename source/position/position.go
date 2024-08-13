@@ -19,7 +19,7 @@ import (
 	"encoding/gob"
 	"time"
 
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 )
 
 const (
@@ -29,8 +29,8 @@ const (
 
 type Type int
 
-// NewFromRecordPosition creates a new Position by decoding sdk.Position.
-func NewFromRecordPosition(recordPosition sdk.Position) (out Position, err error) {
+// NewFromRecordPosition creates a new Position by decoding opencdc.Position.
+func NewFromRecordPosition(recordPosition opencdc.Position) (out Position, err error) {
 	// Empty record position results in empty snapshot Position
 	if recordPosition == nil {
 		return NewDefaultSnapshotPosition(), nil
@@ -84,8 +84,8 @@ type Position struct {
 	Type Type
 }
 
-// ToRecordPosition converts Position into sdk.Position.
-func (p Position) ToRecordPosition() (sdk.Position, error) {
+// ToRecordPosition converts Position into opencdc.Position.
+func (p Position) ToRecordPosition() (opencdc.Position, error) {
 	var buffer bytes.Buffer
 
 	if err := gob.NewEncoder(&buffer).Encode(p); err != nil {

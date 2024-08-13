@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 	"github.com/jaswdr/faker"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
 	helper "github.com/miquido/conduit-connector-azure-storage/test"
@@ -84,13 +84,13 @@ func TestSnapshotIterator(t *testing.T) {
 			record1, err := iterator.Next(ctx)
 			require.NoError(t, err)
 			require.True(t, helper.AssertRecordEquals(t, record1, record1Name, "text/plain", record1Contents))
-			require.Equal(t, sdk.OperationSnapshot, record1.Operation)
+			require.Equal(t, opencdc.OperationSnapshot, record1.Operation)
 
 			require.True(t, iterator.HasNext(ctx))
 			record2, err := iterator.Next(ctx)
 			require.NoError(t, err)
 			require.True(t, helper.AssertRecordEquals(t, record2, record2Name, "text/plain", record2Contents))
-			require.Equal(t, sdk.OperationSnapshot, record2.Operation)
+			require.Equal(t, opencdc.OperationSnapshot, record2.Operation)
 
 			// Let the Goroutine finish
 			for iterator.tomb.Alive() {
@@ -100,7 +100,7 @@ func TestSnapshotIterator(t *testing.T) {
 			require.False(t, iterator.HasNext(ctx))
 			record3, err := iterator.Next(ctx)
 			require.ErrorIs(t, err, ErrSnapshotIteratorIsStopped)
-			require.Equal(t, sdk.Record{}, record3)
+			require.Equal(t, opencdc.Record{}, record3)
 		})
 	}
 
@@ -132,19 +132,19 @@ func TestSnapshotIterator(t *testing.T) {
 		record1, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record1, record1Name, "text/plain", record1Contents))
-		require.Equal(t, sdk.OperationSnapshot, record1.Operation)
+		require.Equal(t, opencdc.OperationSnapshot, record1.Operation)
 
 		require.True(t, iterator.HasNext(ctx))
 		record2, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record2, record2Name, "text/plain", record2Contents))
-		require.Equal(t, sdk.OperationSnapshot, record2.Operation)
+		require.Equal(t, opencdc.OperationSnapshot, record2.Operation)
 
 		require.True(t, iterator.HasNext(ctx))
 		record3, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record3, record3Name, "text/plain", record3Contents))
-		require.Equal(t, sdk.OperationSnapshot, record3.Operation)
+		require.Equal(t, opencdc.OperationSnapshot, record3.Operation)
 
 		// Let the Goroutine finish
 		for iterator.tomb.Alive() {
@@ -154,7 +154,7 @@ func TestSnapshotIterator(t *testing.T) {
 		require.False(t, iterator.HasNext(ctx))
 		record4, err := iterator.Next(ctx)
 		require.ErrorIs(t, err, ErrSnapshotIteratorIsStopped)
-		require.Equal(t, sdk.Record{}, record4)
+		require.Equal(t, opencdc.Record{}, record4)
 	})
 
 	t.Run("Iterator is stopped while reading", func(t *testing.T) {
@@ -182,12 +182,12 @@ func TestSnapshotIterator(t *testing.T) {
 		record1, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record1, record1Name, "text/plain", record1Contents))
-		require.Equal(t, sdk.OperationSnapshot, record1.Operation)
+		require.Equal(t, opencdc.OperationSnapshot, record1.Operation)
 
 		// Stop the iterator
 		iterator.Stop()
 
-		var recordN sdk.Record
+		var recordN opencdc.Record
 		var errN error
 
 		for {
@@ -198,7 +198,7 @@ func TestSnapshotIterator(t *testing.T) {
 		}
 
 		require.ErrorIs(t, errN, ErrSnapshotIteratorIsStopped)
-		require.Equal(t, sdk.Record{}, recordN)
+		require.Equal(t, opencdc.Record{}, recordN)
 	})
 
 	t.Run("Context is cancelled while reading", func(t *testing.T) {
@@ -229,12 +229,12 @@ func TestSnapshotIterator(t *testing.T) {
 		record1, err := iterator.Next(ctx)
 		require.NoError(t, err)
 		require.True(t, helper.AssertRecordEquals(t, record1, record1Name, "text/plain", record1Contents))
-		require.Equal(t, sdk.OperationSnapshot, record1.Operation)
+		require.Equal(t, opencdc.OperationSnapshot, record1.Operation)
 
 		// Cancel the context
 		cancelFunc()
 
-		var recordN sdk.Record
+		var recordN opencdc.Record
 		var errN error
 
 		for {
@@ -245,6 +245,6 @@ func TestSnapshotIterator(t *testing.T) {
 		}
 
 		require.EqualError(t, errN, "context canceled")
-		require.Equal(t, sdk.Record{}, recordN)
+		require.Equal(t, opencdc.Record{}, recordN)
 	})
 }

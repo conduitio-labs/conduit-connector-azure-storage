@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 	"github.com/jaswdr/faker"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -31,20 +31,20 @@ import (
 func TestNewFromRecordPosition(t *testing.T) {
 	fakerInstance := faker.New()
 
-	t.Run("Fails when sdk.Position cannot be decoded into Position", func(t *testing.T) {
-		_, err := NewFromRecordPosition(sdk.Position("invalid binary data"))
+	t.Run("Fails when opencdc.Position cannot be decoded into Position", func(t *testing.T) {
+		_, err := NewFromRecordPosition(opencdc.Position("invalid binary data"))
 
 		require.EqualError(t, err, "unexpected EOF")
 	})
 
-	t.Run("Returns default Snapshot Position when sdk.Position is nil", func(t *testing.T) {
+	t.Run("Returns default Snapshot Position when opencdc.Position is nil", func(t *testing.T) {
 		position, err := NewFromRecordPosition(nil)
 
 		require.NoError(t, err)
 		require.True(t, assertPositionsAreEqual(t, NewDefaultSnapshotPosition(), position))
 	})
 
-	t.Run("Returns Position when sdk.Position was successfully decoded", func(t *testing.T) {
+	t.Run("Returns Position when opencdc.Position was successfully decoded", func(t *testing.T) {
 		p := Position{
 			Key: fakerInstance.Lorem().Sentence(6),
 			Timestamp: fakerInstance.Time().TimeBetween(

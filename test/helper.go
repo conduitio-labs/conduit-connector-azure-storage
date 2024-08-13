@@ -24,7 +24,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -94,7 +94,7 @@ func CreateBlob(client *azblob.Client, containerName, blobName, contentType, con
 	return err
 }
 
-func AssertRecordEquals(t *testing.T, record sdk.Record, fileName, contentType, contents string) bool {
+func AssertRecordEquals(t *testing.T, record opencdc.Record, fileName, contentType, contents string) bool {
 	t.Helper()
 
 	return assert.NotNil(t, record.Key, "Record Key is not set.") &&

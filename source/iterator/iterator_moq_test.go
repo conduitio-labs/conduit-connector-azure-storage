@@ -5,7 +5,7 @@ package iterator
 
 import (
 	"context"
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 	"sync"
 )
 
@@ -22,7 +22,7 @@ var _ Iterator = &IteratorMock{}
 //			HasNextFunc: func(ctx context.Context) bool {
 //				panic("mock out the HasNext method")
 //			},
-//			NextFunc: func(ctx context.Context) (sdk.Record, error) {
+//			NextFunc: func(ctx context.Context) (opencdc.Record, error) {
 //				panic("mock out the Next method")
 //			},
 //			StopFunc: func()  {
@@ -39,7 +39,7 @@ type IteratorMock struct {
 	HasNextFunc func(ctx context.Context) bool
 
 	// NextFunc mocks the Next method.
-	NextFunc func(ctx context.Context) (sdk.Record, error)
+	NextFunc func(ctx context.Context) (opencdc.Record, error)
 
 	// StopFunc mocks the Stop method.
 	StopFunc func()
@@ -98,7 +98,7 @@ func (mock *IteratorMock) HasNextCalls() []struct {
 }
 
 // Next calls NextFunc.
-func (mock *IteratorMock) Next(ctx context.Context) (sdk.Record, error) {
+func (mock *IteratorMock) Next(ctx context.Context) (opencdc.Record, error) {
 	if mock.NextFunc == nil {
 		panic("IteratorMock.NextFunc: method is nil but Iterator.Next was just called")
 	}

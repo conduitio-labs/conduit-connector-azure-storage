@@ -21,6 +21,8 @@ import (
 	"reflect"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/service"
+	"github.com/conduitio/conduit-commons/config"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/miquido/conduit-connector-azure-storage/source/iterator"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
@@ -38,15 +40,15 @@ func NewSource() sdk.Source {
 }
 
 // Parameters is a map of named Parameters that describe how to configure the Source.
-func (s *Source) Parameters() map[string]sdk.Parameter {
+func (s *Source) Parameters() config.Parameters {
 	return s.config.Parameters()
 }
 
-func (s *Source) Configure(_ context.Context, config map[string]string) error {
-	return sdk.Util.ParseConfig(config, &s.config)
+func (s *Source) Configure(ctx context.Context, cfg config.Config) error {
+	return sdk.Util.ParseConfig(ctx, cfg, &s.config, NewSource().Parameters())
 }
 
-func (s *Source) Open(ctx context.Context, rp sdk.Position) error {
+func (s *Source) Open(ctx context.Context, rp opencdc.Position) error {
 	serviceClient, err := service.NewClientFromConnectionString(s.config.ConnectionString, nil)
 	if err != nil {
 		return fmt.Errorf("connector open error: could not create account connection client: %w", err)
@@ -82,30 +84,30 @@ func (s *Source) Open(ctx context.Context, rp sdk.Position) error {
 	return nil
 }
 
-func (s *Source) Read(ctx context.Context) (sdk.Record, error) {
+func (s *Source) Read(ctx context.Context) (opencdc.Record, error) {
 	if !s.iterator.HasNext(ctx) {
-		return sdk.Record{}, sdk.ErrBackoffRetry
+		return opencdc.Record{}, sdk.ErrBackoffRetry
 	}
 
 	record, err := s.iterator.Next(ctx)
 	if err != nil {
 		if errors.Is(err, iterator.ErrSnapshotIteratorIsStopped) {
-			return sdk.Record{}, sdk.ErrBackoffRetry
+			return opencdc.Record{}, sdk.ErrBackoffRetry
 		}
 
-		return sdk.Record{}, fmt.Errorf("read error: %w", err)
+		return opencdc.Record{}, fmt.Errorf("read error: %w", err)
 	}
 
 	// Case when new record could not be produced but no error was thrown at the same time
 	// E.g.: goroutine stopped and w.tomb.Err() returned empty record and nil error
-	if reflect.DeepEqual(record, sdk.Record{}) {
-		return sdk.Record{}, sdk.ErrBackoffRetry
+	if reflect.DeepEqual(record, opencdc.Record{}) {
+		return opencdc.Record{}, sdk.ErrBackoffRetry
 	}
 
 	return record, nil
 }
 
-func (s *Source) Ack(ctx context.Context, position sdk.Position) error {
+func (s *Source) Ack(ctx context.Context, position opencdc.Position) error {
 	sdk.Logger(ctx).Debug().Str("position", string(position)).Msg("got ack")
 
 	return nil // no ack needed

@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/jaswdr/faker"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
@@ -38,7 +39,7 @@ func TestSource_FailsWhenConnectionStringIsInvalid(t *testing.T) {
 		ConfigKeyMaxResults:       "1",
 	}
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 
@@ -59,7 +60,7 @@ func TestSource_FailsWhenConnectionCannotBeEstablished(t *testing.T) {
 		ConfigKeyMaxResults:       "1",
 	}
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 
@@ -84,7 +85,7 @@ func TestSource_FailsWhenContainerDoesNotExist(t *testing.T) {
 		}
 	)
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 
@@ -119,7 +120,7 @@ func TestSource_FailsWhenRecordPositionIsInvalid(t *testing.T) {
 		_ = src.Teardown(ctx)
 	})
 
-	require.EqualError(t, src.Open(ctx, sdk.Position("invalid gob object")), "connector open error: invalid or unsupported position: unexpected EOF")
+	require.EqualError(t, src.Open(ctx, opencdc.Position("invalid gob object")), "connector open error: invalid or unsupported position: unexpected EOF")
 }
 
 func TestSource_ReadsContainerItemsWithSnapshotIteratorAndThenReadsAddedItemsWithCDCIterator(t *testing.T) {
@@ -184,7 +185,7 @@ func TestSource_ReadsContainerItemsWithSnapshotIteratorAndThenReadsAddedItemsWit
 		// No third record available, backoff
 		// By this time, combined iterator should switch from snapshot to CDC iterator
 		record3, err := src.Read(ctx)
-		require.Equal(t, sdk.Record{}, record3)
+		require.Equal(t, opencdc.Record{}, record3)
 		require.ErrorIs(t, err, sdk.ErrBackoffRetry)
 	})
 
@@ -195,7 +196,7 @@ func TestSource_ReadsContainerItemsWithSnapshotIteratorAndThenReadsAddedItemsWit
 
 		// No new record is available until 1 polling period passes
 		record1, err := src.Read(ctx)
-		require.Equal(t, sdk.Record{}, record1)
+		require.Equal(t, opencdc.Record{}, record1)
 		require.ErrorIs(t, err, sdk.ErrBackoffRetry)
 
 		// Polling Period is 1.5s
@@ -209,7 +210,7 @@ func TestSource_ReadsContainerItemsWithSnapshotIteratorAndThenReadsAddedItemsWit
 
 		// Read the second record polled
 		record3, err := src.Read(ctx)
-		require.Equal(t, sdk.Record{}, record3)
+		require.Equal(t, opencdc.Record{}, record3)
 		require.ErrorIs(t, err, sdk.ErrBackoffRetry)
 	})
 }
@@ -230,7 +231,7 @@ func TestSource_SnapshotIteratorReadsEmptyContainerAndThenSwitchedToCDCIterator(
 
 	helper.PrepareContainer(t, helper.NewAzureBlobClient(), containerName)
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 	require.NoError(t, src.Open(ctx, nil))
@@ -241,19 +242,19 @@ func TestSource_SnapshotIteratorReadsEmptyContainerAndThenSwitchedToCDCIterator(
 
 	t.Run("Firstly, snapshot iterator runs and reads properly empty container", func(t *testing.T) {
 		record, err := src.Read(ctx)
-		require.Equal(t, sdk.Record{}, record)
+		require.Equal(t, opencdc.Record{}, record)
 		require.ErrorIs(t, err, sdk.ErrBackoffRetry)
 	})
 
 	t.Run("Secondly, snapshot iterator switches to CDC iterator", func(t *testing.T) {
 		record, err := src.Read(ctx)
-		require.Equal(t, sdk.Record{}, record)
+		require.Equal(t, opencdc.Record{}, record)
 		require.ErrorIs(t, err, sdk.ErrBackoffRetry)
 	})
 
 	t.Run("Thirdly, CDC iterator runs and reads properly empty container", func(t *testing.T) {
 		record, err := src.Read(ctx)
-		require.Equal(t, sdk.Record{}, record)
+		require.Equal(t, opencdc.Record{}, record)
 		require.ErrorIs(t, err, sdk.ErrBackoffRetry)
 	})
 }
@@ -302,7 +303,7 @@ func TestSource_CDCIteratorOmitsAlreadyReadItems(t *testing.T) {
 
 	require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, createdWhileWorking1Name, createdWhileWorking1ContentType, createdWhileWorking1Contents))
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 	require.NoError(t, src.Open(ctx, recordPosition))
@@ -318,6 +319,6 @@ func TestSource_CDCIteratorOmitsAlreadyReadItems(t *testing.T) {
 	require.NoError(t, src.Ack(ctx, record1.Position))
 
 	record2, err := src.Read(ctx)
-	require.Equal(t, sdk.Record{}, record2)
+	require.Equal(t, opencdc.Record{}, record2)
 	require.ErrorIs(t, err, sdk.ErrBackoffRetry)
 }
