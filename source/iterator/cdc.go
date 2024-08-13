@@ -24,6 +24,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/blob"
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
 	"gopkg.in/tomb.v2"
@@ -43,7 +44,7 @@ func NewCDCIterator(
 
 	cdc := CDCIterator{
 		client:        client,
-		buffer:        make(chan sdk.Record, 1),
+		buffer:        make(chan opencdc.Record, 1),
 		ticker:        time.NewTicker(pollingPeriod),
 		isTruncated:   true,
 		nextKeyMarker: nil,
@@ -59,7 +60,7 @@ func NewCDCIterator(
 
 type CDCIterator struct {
 	client        *container.Client
-	buffer        chan sdk.Record
+	buffer        chan opencdc.Record
 	ticker        *time.Ticker
 	lastModified  time.Time
 	maxResults    int32
@@ -72,20 +73,20 @@ func (w *CDCIterator) HasNext(_ context.Context) bool {
 	return len(w.buffer) > 0 || !w.tomb.Alive() // if tomb is dead we return true so caller will fetch error with Next
 }
 
-func (w *CDCIterator) Next(ctx context.Context) (sdk.Record, error) {
+func (w *CDCIterator) Next(ctx context.Context) (opencdc.Record, error) {
 	select {
 	case r, active := <-w.buffer:
 		if !active {
-			return sdk.Record{}, ErrCDCIteratorIsStopped
+			return opencdc.Record{}, ErrCDCIteratorIsStopped
 		}
 
 		return r, nil
 
 	case <-w.tomb.Dead():
-		return sdk.Record{}, w.tomb.Err()
+		return opencdc.Record{}, w.tomb.Err()
 
 	case <-ctx.Done():
-		return sdk.Record{}, ctx.Err()
+		return opencdc.Record{}, ctx.Err()
 	}
 }
 
@@ -139,8 +140,8 @@ func (w *CDCIterator) producer() error {
 						}
 					}
 
-					// Prepare the sdk.Record
-					var output sdk.Record
+					// Prepare the opencdc.Record
+					var output opencdc.Record
 
 					if item.Deleted != nil && *item.Deleted {
 						var err error
@@ -181,8 +182,8 @@ func (w *CDCIterator) producer() error {
 	}
 }
 
-// createUpsertedRecord converts blob item into sdk.Record with item's contents or returns error when failure.
-func (w *CDCIterator) createUpsertedRecord(ctx context.Context, item *container.BlobItem, resp azblob.DownloadStreamResponse) (sdk.Record, error) {
+// createUpsertedRecord converts blob item into opencdc.Record with item's contents or returns error when failure.
+func (w *CDCIterator) createUpsertedRecord(ctx context.Context, item *container.BlobItem, resp azblob.DownloadStreamResponse) (opencdc.Record, error) {
 	// Try to read item's contents
 	reader := resp.NewRetryReader(ctx, &blob.RetryReaderOptions{
 		MaxRetries: 3,
@@ -191,7 +192,7 @@ func (w *CDCIterator) createUpsertedRecord(ctx context.Context, item *container.
 
 	rawBody, err := io.ReadAll(reader)
 	if err != nil {
-		return sdk.Record{}, err
+		return opencdc.Record{}, err
 	}
 
 	// Prepare position information
@@ -199,40 +200,40 @@ func (w *CDCIterator) createUpsertedRecord(ctx context.Context, item *container.
 
 	recordPosition, err := p.ToRecordPosition()
 	if err != nil {
-		return sdk.Record{}, err
+		return opencdc.Record{}, err
 	}
 
 	// Prepare metadata
-	metadata := make(sdk.Metadata)
+	metadata := make(opencdc.Metadata)
 	metadata.SetCreatedAt(p.Timestamp)
 	metadata["azure-storage.content-type"] = *resp.ContentType
 
 	if item.Properties.CreationTime == nil || item.Properties.LastModified == nil || item.Properties.CreationTime.Equal(*item.Properties.LastModified) {
 		return sdk.Util.Source.NewRecordCreate(
-			recordPosition, metadata, sdk.RawData(p.Key), sdk.RawData(rawBody),
+			recordPosition, metadata, opencdc.RawData(p.Key), opencdc.RawData(rawBody),
 		), nil
 	}
 
 	return sdk.Util.Source.NewRecordUpdate(
-		recordPosition, metadata, sdk.RawData(p.Key), nil, sdk.RawData(rawBody),
+		recordPosition, metadata, opencdc.RawData(p.Key), nil, opencdc.RawData(rawBody),
 	), nil
 }
 
-// createDeletedRecord converts blob item into sdk.Record indicating that item was removed or returns error
+// createDeletedRecord converts blob item into opencdc.Record indicating that item was removed or returns error
 // when failure.
-func (w *CDCIterator) createDeletedRecord(item *container.BlobItem) (sdk.Record, error) {
+func (w *CDCIterator) createDeletedRecord(item *container.BlobItem) (opencdc.Record, error) {
 	// Prepare position information
 	p := position.NewCDCPosition(*item.Name, *item.Properties.LastModified)
 
 	recordPosition, err := p.ToRecordPosition()
 	if err != nil {
-		return sdk.Record{}, err
+		return opencdc.Record{}, err
 	}
 
 	// Prepare metadata
-	metadata := make(sdk.Metadata)
+	metadata := make(opencdc.Metadata)
 	metadata.SetCreatedAt(p.Timestamp)
 
 	// Return the record
-	return sdk.Util.Source.NewRecordDelete(recordPosition, metadata, sdk.RawData(p.Key)), nil
+	return sdk.Util.Source.NewRecordDelete(recordPosition, metadata, opencdc.RawData(p.Key), nil), nil
 }

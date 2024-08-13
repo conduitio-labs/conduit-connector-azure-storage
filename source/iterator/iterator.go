@@ -19,15 +19,15 @@ package iterator
 import (
 	"context"
 
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 )
 
 type Iterator interface {
-	// HasNext indicates whether there is new sdk.Record available (`true`) or not (`false`)
+	// HasNext indicates whether there is new opencdc.Record available (`true`) or not (`false`)
 	HasNext(ctx context.Context) bool
 
-	// Next returns new sdk.Record while reading the container or error when operation failed
-	Next(ctx context.Context) (sdk.Record, error)
+	// Next returns new opencdc.Record while reading the container or error when operation failed
+	Next(ctx context.Context) (opencdc.Record, error)
 
 	// Stop informs the iterator to stop processing new records.
 	// All currently ongoing operations should be gracefully shut down.

@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
-	sdk "github.com/conduitio/conduit-connector-sdk"
+	"github.com/conduitio/conduit-commons/opencdc"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
 )
 
@@ -94,19 +94,19 @@ func (c *CombinedIterator) HasNext(ctx context.Context) bool {
 	}
 }
 
-func (c *CombinedIterator) Next(ctx context.Context) (sdk.Record, error) {
+func (c *CombinedIterator) Next(ctx context.Context) (opencdc.Record, error) {
 	switch c.iterator.(type) {
 	case *SnapshotIterator:
 		r, err := c.iterator.Next(ctx)
 		if err != nil {
-			return sdk.Record{}, err
+			return opencdc.Record{}, err
 		}
 
 		if !c.iterator.HasNext(ctx) {
 			// Change the last record's position to CDC
 			r.Position, err = convertToCDCPosition(r.Position)
 			if err != nil {
-				return sdk.Record{}, err
+				return opencdc.Record{}, err
 			}
 		}
 
@@ -116,7 +116,7 @@ func (c *CombinedIterator) Next(ctx context.Context) (sdk.Record, error) {
 		return c.iterator.Next(ctx)
 
 	default:
-		return sdk.Record{}, ErrUnsupportedIterator
+		return opencdc.Record{}, ErrUnsupportedIterator
 	}
 }
 
@@ -157,10 +157,10 @@ func (c *CombinedIterator) switchToCDCIterator() (err error) {
 }
 
 // convertToCDCPosition changes Position type to CDC.
-func convertToCDCPosition(p sdk.Position) (sdk.Position, error) {
+func convertToCDCPosition(p opencdc.Position) (opencdc.Position, error) {
 	cdcPos, err := position.NewFromRecordPosition(p)
 	if err != nil {
-		return sdk.Position{}, err
+		return opencdc.Position{}, err
 	}
 
 	cdcPos.Type = position.TypeCDC

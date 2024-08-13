@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/miquido/conduit-connector-azure-storage/source"
 	helper "github.com/miquido/conduit-connector-azure-storage/test"
@@ -32,18 +33,18 @@ type CustomConfigurableAcceptanceTestDriver struct {
 	containerName string
 }
 
-func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T, op sdk.Operation) sdk.Record {
+func (d *CustomConfigurableAcceptanceTestDriver) GenerateRecord(t *testing.T, op opencdc.Operation) opencdc.Record {
 	t.Helper()
 
 	record := d.ConfigurableAcceptanceTestDriver.GenerateRecord(t, op)
 
 	// Override Key
-	record.Key = sdk.RawData(fmt.Sprintf("file-%d.txt", time.Now().UnixMicro()))
+	record.Key = opencdc.RawData(fmt.Sprintf("file-%d.txt", time.Now().UnixMicro()))
 
 	return record
 }
 
-func (d *CustomConfigurableAcceptanceTestDriver) WriteToSource(_ *testing.T, records []sdk.Record) (results []sdk.Record) {
+func (d *CustomConfigurableAcceptanceTestDriver) WriteToSource(_ *testing.T, records []opencdc.Record) (results []opencdc.Record) {
 	for _, record := range records {
 		_ = helper.CreateBlob(
 			d.blobClient,
