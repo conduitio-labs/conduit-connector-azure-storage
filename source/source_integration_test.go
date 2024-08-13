@@ -39,7 +39,7 @@ func TestSource_FailsWhenConnectionStringIsInvalid(t *testing.T) {
 		ConfigKeyMaxResults:       "1",
 	}
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 
