@@ -21,6 +21,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
 	"github.com/jaswdr/faker"
 	"github.com/miquido/conduit-connector-azure-storage/source/position"
@@ -119,7 +120,6 @@ func TestSource_FailsWhenRecordPositionIsInvalid(t *testing.T) {
 		_ = src.Teardown(ctx)
 	})
 
-	require.EqualError(t, src.Open(ctx, sdk.Position("invalid gob object")), "connector open error: invalid or unsupported position: unexpected EOF")
 	require.EqualError(t, src.Open(ctx, opencdc.Position("invalid gob object")), "connector open error: invalid or unsupported position: unexpected EOF")
 }
 
