@@ -60,7 +60,7 @@ func TestSource_FailsWhenConnectionCannotBeEstablished(t *testing.T) {
 		ConfigKeyMaxResults:       "1",
 	}
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 
@@ -85,7 +85,7 @@ func TestSource_FailsWhenContainerDoesNotExist(t *testing.T) {
 		}
 	)
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 
@@ -231,7 +231,7 @@ func TestSource_SnapshotIteratorReadsEmptyContainerAndThenSwitchedToCDCIterator(
 
 	helper.PrepareContainer(t, helper.NewAzureBlobClient(), containerName)
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 	require.NoError(t, src.Open(ctx, nil))
@@ -303,7 +303,7 @@ func TestSource_CDCIteratorOmitsAlreadyReadItems(t *testing.T) {
 
 	require.NoError(t, helper.CreateBlob(azureBlobClient, containerName, createdWhileWorking1Name, createdWhileWorking1ContentType, createdWhileWorking1Contents))
 
-	src := NewSource().(*Source)
+	src := NewSource()
 
 	require.NoError(t, src.Configure(ctx, cfgRaw))
 	require.NoError(t, src.Open(ctx, recordPosition))
