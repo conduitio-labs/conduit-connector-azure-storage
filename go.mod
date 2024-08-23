@@ -9,7 +9,7 @@ require (
 	github.com/conduitio/conduit-connector-sdk v0.10.0
 	github.com/golangci/golangci-lint v1.60.3
 	github.com/jaswdr/faker v1.19.1
-	github.com/matryer/moq v0.3.4
+	github.com/matryer/moq v0.4.0
 	github.com/stretchr/testify v1.9.0
 	go.uber.org/goleak v1.3.0
 	gopkg.in/tomb.v2 v2.0.0-20161208151619-d5d1b5820637
