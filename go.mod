@@ -1,6 +1,7 @@
 module github.com/miquido/conduit-connector-azure-storage
 
-go 1.22.6
+go 1.23.2
+
 require (
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.16.0
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.4.1
