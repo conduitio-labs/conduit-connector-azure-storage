@@ -97,6 +97,7 @@ func TestAcceptance(t *testing.T) {
 		},
 	}
 
+	//nolint:staticcheck // We want to be specific
 	testDriver.ConfigurableAcceptanceTestDriver.Config.BeforeTest = func(t *testing.T) {
 		t.Helper()
 
