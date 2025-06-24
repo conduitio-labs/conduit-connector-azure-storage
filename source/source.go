@@ -21,11 +21,11 @@ import (
 	"reflect"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/service"
+	"github.com/conduitio-labs/conduit-connector-azure-storage/source/iterator"
+	"github.com/conduitio-labs/conduit-connector-azure-storage/source/position"
 	"github.com/conduitio/conduit-commons/config"
 	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	"github.com/miquido/conduit-connector-azure-storage/source/iterator"
-	"github.com/miquido/conduit-connector-azure-storage/source/position"
 )
 
 type Source struct {

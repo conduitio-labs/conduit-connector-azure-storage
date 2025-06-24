@@ -19,7 +19,7 @@ package iterator
 import (
 	"testing"
 
-	"github.com/miquido/conduit-connector-azure-storage/source/position"
+	"github.com/conduitio-labs/conduit-connector-azure-storage/source/position"
 	"github.com/stretchr/testify/require"
 )
 
