@@ -20,10 +20,10 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob"
+	"github.com/conduitio-labs/conduit-connector-azure-storage/source"
+	helper "github.com/conduitio-labs/conduit-connector-azure-storage/test"
 	"github.com/conduitio/conduit-commons/opencdc"
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	"github.com/miquido/conduit-connector-azure-storage/source"
-	helper "github.com/miquido/conduit-connector-azure-storage/test"
 	"go.uber.org/goleak"
 )
 

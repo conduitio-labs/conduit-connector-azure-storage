@@ -1,4 +1,4 @@
-module github.com/miquido/conduit-connector-azure-storage
+module github.com/conduitio-labs/conduit-connector-azure-storage
 
 go 1.24.2
 

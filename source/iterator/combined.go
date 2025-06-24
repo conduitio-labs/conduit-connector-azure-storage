@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/storage/azblob/container"
+	"github.com/conduitio-labs/conduit-connector-azure-storage/source/position"
 	"github.com/conduitio/conduit-commons/opencdc"
-	"github.com/miquido/conduit-connector-azure-storage/source/position"
 )
 
 var ErrUnsupportedIterator = errors.New("unsupported iterator")
