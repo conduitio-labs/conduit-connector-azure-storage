@@ -22,10 +22,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/conduitio-labs/conduit-connector-azure-storage/source/position"
+	helper "github.com/conduitio-labs/conduit-connector-azure-storage/test"
 	"github.com/conduitio/conduit-commons/opencdc"
 	"github.com/jaswdr/faker"
-	"github.com/miquido/conduit-connector-azure-storage/source/position"
-	helper "github.com/miquido/conduit-connector-azure-storage/test"
 	"github.com/stretchr/testify/require"
 )
 
