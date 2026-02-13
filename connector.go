@@ -15,8 +15,8 @@
 package azure
 
 import (
+	"github.com/conduitio-labs/conduit-connector-azure-storage/source"
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	"github.com/miquido/conduit-connector-azure-storage/source"
 )
 
 // Connector represents a sdk.Connector for Azure Storage.

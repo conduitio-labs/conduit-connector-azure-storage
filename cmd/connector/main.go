@@ -15,8 +15,8 @@
 package main
 
 import (
+	azure "github.com/conduitio-labs/conduit-connector-azure-storage"
 	sdk "github.com/conduitio/conduit-connector-sdk"
-	azure "github.com/miquido/conduit-connector-azure-storage"
 )
 
 func main() {
